@@ -1,0 +1,151 @@
+﻿@using System.Security.Claims
+@model LoginViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cookie Sharing between ASP.NET Core and ASP.NET 4.5</title>
+    <style>
+        html {
+            background: #f1f1f1;
+            height: 100%;
+        }
+
+        body {
+            background: #fff;
+            color: #505050;
+            font: 14px 'Segoe UI', tahoma, arial, helvetica, sans-serif;
+            margin: 1%;
+            min-height: 95.5%;
+            border: 1px solid silver;
+            position: relative;
+        }
+
+        #content {
+            padding: 10px 30px 10px 30px;
+        }
+
+        h1 {
+            font-size: 44px;
+            font-weight: normal;
+        }
+
+        h2 {
+            font-size: 38px;
+            font-weight: normal;
+        }
+
+        h3 {
+            font-size: 32px;
+            font-weight: normal;
+        }
+
+        p, input, button {
+            font-size: 26px;
+            font-weight: normal;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        table.cookie {
+            table-layout:fixed;
+        }
+
+        table th, table td {
+            font-size: 26px;
+            text-align: left;
+            word-wrap: break-word;
+            vertical-align: top;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <h1>Cookie Sharing between ASP.NET Core and ASP.NET 4.5</h1>
+        <h2>This is .NET Desktop</h2>
+        <hr />
+        @if (Context.Request.Cookies.Count != 0)
+        {
+            <h3>Cookies</h3>
+            <table class="cookie">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (string key in Context.Request.Cookies.Keys)
+                    {
+                        <tr>
+                            <td>@key</td>
+                            <td>@Context.Request.Cookies[key].Value</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <h3>No cookies found.</h3>
+        }
+        <hr />
+        @if (User.Identity.IsAuthenticated)
+        {
+            <h3>Current User Details</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Value</th>
+                        <th>Issuer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @{
+                    var claimsUser = User.Identity as ClaimsIdentity;
+                    if (claimsUser != null)
+                    {
+                        foreach (var c in claimsUser.Claims)
+                        {
+                        <tr>
+                            <td>@c.Type</td>
+                            <td>@c.Value</td>
+                            <td>@c.Issuer</td>
+                        </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="3">Cookie user is not a ClaimsIdentity.</td></tr>
+                    }
+                }
+                </tbody>
+            </table>
+            <form asp-controller="Home" asp-action="Logout" method="post">
+                <p>
+                    <button type="submit">Logout</button>
+                </p>
+            </form>
+
+        }
+        else
+        {
+            <h3>Create a login cookie</h3>
+            using (Html.BeginForm("Login", "Home", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken();
+                <p>
+                    @Html.LabelFor(model => model.Email) :
+                    @Html.TextBoxFor(model => model.Email)
+                </p>
+                <p>
+                    <button type="submit">Login</button>
+                </p>
+            }
+        }
+    </div>
+</body>
+</html>

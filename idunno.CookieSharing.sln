@@ -8,11 +8,19 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A3258D02-C080-4BEC-8FAF-FD625D716164}"
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
+		readme.md = readme.md
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "idunno.CookieSharing", "src\idunno.CookieSharing\idunno.CookieSharing.xproj", "{B760ED43-8390-4E40-9194-45E494204062}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "idunno.CookieSharing.Core", "src\idunno.CookieSharing.Core\idunno.CookieSharing.Core.xproj", "{B760ED43-8390-4E40-9194-45E494204062}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "idunno.KeyRing", "src\idunno.KeyRing\idunno.KeyRing.shproj", "{63EC566F-10FE-431A-8FDD-7FC50BD0CA2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "idunno.CookieSharing.FullFramework", "src\idunno.CookieSharing.FullFramework\idunno.CookieSharing.FullFramework.csproj", "{0A4E611C-4885-40FF-B49B-49A228C35A33}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\idunno.KeyRing\idunno.KeyRing.projitems*{63ec566f-10fe-431a-8fdd-7fc50bd0ca2a}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -22,11 +30,17 @@ Global
 		{B760ED43-8390-4E40-9194-45E494204062}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B760ED43-8390-4E40-9194-45E494204062}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B760ED43-8390-4E40-9194-45E494204062}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A4E611C-4885-40FF-B49B-49A228C35A33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A4E611C-4885-40FF-B49B-49A228C35A33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A4E611C-4885-40FF-B49B-49A228C35A33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A4E611C-4885-40FF-B49B-49A228C35A33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B760ED43-8390-4E40-9194-45E494204062} = {901280B1-53AC-4C94-8FC0-965C7B121830}
+		{63EC566F-10FE-431A-8FDD-7FC50BD0CA2A} = {901280B1-53AC-4C94-8FC0-965C7B121830}
+		{0A4E611C-4885-40FF-B49B-49A228C35A33} = {901280B1-53AC-4C94-8FC0-965C7B121830}
 	EndGlobalSection
 EndGlobal

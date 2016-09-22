@@ -1,0 +1,6 @@
+## Specific ignore file to stop data protection keys
+## making it into source control.
+
+*.shproj
+*.projitems
+key-*.xml
