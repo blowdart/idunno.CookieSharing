@@ -46,7 +46,10 @@ namespace idunno.CookieSharing.Core
 
             // Now we create a data protector, with a fixed purpose and sub-purpose used in key derivation.
             var protectionProvider = DataProtectionProvider.Create(new DirectoryInfo(keyRingPath));
-            var dataProtector = protectionProvider.CreateProtector("Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware", authenticationScheme, "v2");
+            var dataProtector = protectionProvider.CreateProtector(
+                "Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware",
+                "Cookie",
+                "v2");
             // And finally create a new auth ticket formatter using the data protector.
             var ticketFormat = new TicketDataFormat(dataProtector);
 
