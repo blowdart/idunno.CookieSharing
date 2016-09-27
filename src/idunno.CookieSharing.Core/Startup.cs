@@ -58,10 +58,6 @@ namespace idunno.CookieSharing.Core
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationScheme = "Cookie",
-                LoginPath = new PathString("/Account/Login/"),
-                AccessDeniedPath = new PathString("/Account/Forbidden/"),
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = true,
                 CookieName = ".AspNet.SharedCookie",
                 TicketDataFormat = ticketFormat
             });

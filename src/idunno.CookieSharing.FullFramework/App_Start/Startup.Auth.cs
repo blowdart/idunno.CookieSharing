@@ -43,8 +43,6 @@ namespace idunno.CookieSharing.FullFramework
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = "Cookie",
-                AuthenticationMode = Microsoft.Owin.Security.AuthenticationMode.Active,
-                LoginPath = new PathString("/Account/Login"),
                 CookieName = ".AspNet.SharedCookie",
                 TicketDataFormat = ticketFormat
             });

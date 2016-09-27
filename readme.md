@@ -2,36 +2,29 @@
 
 A commonly expressed scenario is a desire to share logins between an existing ASP.NET 4.5 application and an ASP.NET Core application. This can be achieved by creating a login cookie which can be read by both applications.
 
-## Caveats
-
-Sharing cookies comes with two caveats;
-
-1. As only one system is the "true" login provider, the depending application must treat the login cookie as its only source of truth. This means any adjustments to the identity in the login database will not be reflected in the other application, for example, if a user is disabled their cookie will still work on the depending application, or, if the user is added to, or removed from groups, or they edit their name, these changes will not reflect in the depending system, unless you the developer create a new login cookie.
-   Therefore you should either view cookie sharing as a stopgap mechanism until you migrate all your applications to .NET Core and sharing a single Identity 3.0 database, or you can replace the cookie middleware `Validator` in any ASP.NET Core system, or the ASP.NET 4.5 Cookie middleware `OnValidateIdentity` event to talk to the primary system via an API call to validate cookies are still accurate. 
-   ASP.NET Core Validators are documented in the [Cookie Middleware documentation](https://docs.asp.net/en/latest/security/authentication/cookie.html#reacting-to-back-end-changes).
-
-2. You cannot specify a host name in the login path, so if your applications are on different host names you cannot point Application 2's login page to Application 1's login page using cookie middleware. You could manually achieve this with redirection code in Application 1's login controller, appending a query string parameter to indicate the return URL needs to return to Application 2. You would also need to change the code in Application 1 only returns to a safe list of known hosts.
-
 ## Instructions
 
 Sharing authorization cookies between ASP.NET 4.5 and .NET Core takes a number of steps. The steps need vary based on whether you are using ASP.NET Identity or the ASP.Net Cookie middleware without Identity. Please follow the correct instructions for your configuration.
 
 
-1. **Install the interop package into your ASP.NET 4.5 application.**
+1. **Install the interop packages into your applications.**
    
+   1. **ASP.NET 4.5**
+
    Open the nuget package manager, or the nuget console and add a reference to `Microsoft.Owin.Security.Interop`.
 
-2. **Install the data protection extensions package into your ASP.NET Core application.**
+   2. **ASP.NET Core**
 
    Open the nuget package manager, or the nuget console and add a reference to `Microsoft.AspNetCore.DataProtection.Extensions`.
 
-3. **Make the cookie names in both applications identical.**
+2. **Make the cookie names in both applications identical.**
 
-   1. **ASP.NET 4.5 applications**
+   1. **ASP.NET 4.5**
    
       In your ASP.NET 4.5 application find the `app.UseCookieAuthentication()` call. This is normally in `App_Start\Startup.Auth.cs`.
    
-      In the `CookieAuthenticationOptions` parameter passed to `app.UseCookieAuthentication()` set the `CookieName` property to a fixed value,
+      In the `CookieAuthenticationOptions` parameter passed to `app.UseCookieAuthentication()` set the `CookieName` property to a value that will be shared between all applications
+      and also set the `AuthenticationType` to a value that will be shared with the other applications,
  
       ```
       app.UseCookieAuthentication(new CookieAuthenticationOptions
@@ -44,14 +37,16 @@ Sharing authorization cookies between ASP.NET 4.5 and .NET Core takes a number o
       });
       ```
 
-   2. **ASP.NET Core applications With Identity**
+   2. **ASP.NET Core with ASP.NET Identity**
 
       In the ASP.NET Core application and find the `services.AddIdentity<ApplicationUser, IdentityRole>` call. This is normally in the `ConfigureServices()` method in `startup.cs`
 
       You must create a new parameter for cookie configuration, and pass it as the `Cookies` property on the `IdentityOptions` parameter in the call to `servicesAddIdentity<ApplicationUser, IdentityRole>()`. 
       In applications created by the ASP.NET templates this parameter does not exist.
 
-      Change the call to `services.AddIdentity<ApplicationUser, IdentityRole>()` to add the `IdentityOptions` parameter as follows
+      Change the call to `services.AddIdentity<ApplicationUser, IdentityRole>()` to add the `IdentityOptions` parameter and 
+      set the `CookieName` property to be the same value you set in the ASP.NET 4.5 application and 
+      set the `AuthenticationScheme` property to be the same value you used for `AuthenticationType` in the ASP.NET 4.5 application
 
       ```
       services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -73,11 +68,13 @@ Sharing authorization cookies between ASP.NET 4.5 and .NET Core takes a number o
           .AddDefaultTokenProviders();
       ```
 
-   3. **ASP.NET Core applications using Cookie Middleware directly**
+   3. **ASP.NET Core using Cookie Middleware directly**
    
       In the ASP.NET Core application and find the `app.UseCookieAuthentication()` call. This is normally in the `Configure()` method in `startup.cs`
 
-      In the `CookieAuthenticationOptions` parameter passed to `app.UseCookieAuthentication()` set the `CookieName` property to a fixed value,
+      In the `CookieAuthenticationOptions` parameter passed to `app.UseCookieAuthentication()` 
+      set the `CookieName` property to be the same value you set in the ASP.NET 4.5 application and
+      set the `AuthenticationScheme` property to be the same value you used for `AuthenticationType` in the ASP.NET 4.5 application
 
       ```
       app.UseCookieAuthentication(new CookieAuthenticationOptions
@@ -92,7 +89,7 @@ Sharing authorization cookies between ASP.NET 4.5 and .NET Core takes a number o
       ```
    Remember the `CookieName` property must have the same value in each application.
 
-4. **(Optionally) Change the cookie domain and HTTPS settings.**
+   4. **(Optionally) Change the cookie domain and HTTPS settings.**
    
    Browsers naturally share cookies between the same domain name. For example if both your sites run in subdirectories under https://contoso.com then cookies will automatically be shared.
    
@@ -107,7 +104,7 @@ Sharing authorization cookies between ASP.NET 4.5 and .NET Core takes a number o
    Additionally a cookie which has the Secure flag set will not flow to an HTTP site. The ASP.NET Cookie middlewares will automatically set the secure flag when it is creating during an HTTPS request. 
    While it is possible to override this behavior using the `CookieSecure` property this is not recommended, for security if one site you want to share cookies with is on HTTPS then all sites that share the cookie should be on HTTPS.
 
-4. **Select a common data protection repository accessible by both applications.**
+3. **Select a common data protection repository location accessible by both applications.**
    
    In these instructions we're going to use a shared directory (`C:\keyring`). 
    If your applications aren't on the same server, or can't access the same NTFS share you can use other keyring repositories.
@@ -118,92 +115,81 @@ Sharing authorization cookies between ASP.NET 4.5 and .NET Core takes a number o
    
    You can develop your own key ring repository by implementing the `IXmlRepository` interface.
   
-5. **Configure the ASP.NET Core app to use the a data protector pointing to the shared repository in the ticket formatter.**
+4. **Configure your applications to use the same cookie format**
 
-   Return to the location where your app calls `services.AddIdentity<ApplicationUser, IdentityRole>()` or `app.UseCookieAuthentication()`.
+   1. **ASP.NET 4.5**
 
-   Add `using Microsoft.AspNetCore.DataProtection;` to the using declarations at the top of the file.
+      Return to the location where your app calls `app.UseCookieAuthentication()`;
 
-   Now add the following code before the call to `services.AddIdentity<ApplicationUser, IdentityRole>()` or `app.UseCookieAuthentication()`.
+      Add `using Microsoft.Owin.Security.Interop;` to the using declarations at the top of the file.
 
-   ```
-   var protectionProvider = DataProtectionProvider.Create(
-       new DirectoryInfo(@"c:\keyring"));
-   var dataProtector = protectionProvider.CreateProtector(
-       "CookieAuthenticationMiddleware",
-       "Cookie",
-       "v2");
-   var ticketFormat = new TicketDataFormat(dataProtector);
-   ```     
-   Finally update your `CookieAuthenticationOptions` to add a `TicketDataFormat` parameter, using the `ticketFormat` variable created in the code above.
+      Now add the following code before the call to `app.UseCookieAuthentication()`.
 
-   1. **ASP.NET Core applications With Identity**
       ```
-      services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-      {
-          options.Cookies = new Microsoft.AspNetCore.Identity.IdentityCookieOptions
-          {
-              ApplicationCookie = new CookieAuthenticationOptions
-              {
-                  AuthenticationScheme = "Cookie",
-                  LoginPath = new PathString("/Account/Login/"),
-                  AccessDeniedPath = new PathString("/Account/Forbidden/"),
-                  AutomaticAuthenticate = true,
-                  AutomaticChallenge = true,
-                  CookieName = ".AspNet.SharedCookie",
-                  TicketDataFormat = ticketFormat
-              }
-          };
-       })
-       .AddEntityFrameworkStores<ApplicationDbContext>()
-       .AddDefaultTokenProviders();
-       ```
+      var protectionProvider = DataProtectionProvider.Create(
+          new DirectoryInfo(@"c:\keyring"));
+      var dataProtector = protectionProvider.CreateProtector(
+         "CookieAuthenticationMiddleware",
+         "Cookie",
+         "v2");
+      var ticketFormat = new AspNetTicketDataFormat(new DataProtectorShim(dataProtector));
+      ```
 
-   1. **ASP.NET Core applications using Cookie Middleware directly**
+      Finally update your `CookieAuthenticationOptions` to add a `TicketDataFormat` parameter, using the `ticketFormat` variable created in the code above.
+
       ```
       app.UseCookieAuthentication(new CookieAuthenticationOptions
       {
-          AuthenticationScheme = "Cookie",
-          LoginPath = new PathString("/Account/Login/"),
-          AccessDeniedPath = new PathString("/Account/Forbidden/"),
-          AutomaticAuthenticate = true,
-          AutomaticChallenge = true,
+          AuthenticationType = "Cookie",
           CookieName = ".AspNet.SharedCookie",
           TicketDataFormat = ticketFormat
       });
       ```
 
-6. **Configure the ASP.NET 4.5 app to use the interop format, along with a fixed data protector which matches the data protector from step 5.**
+    2. **ASP.NET Core**
+       Return to the location where your app calls `services.AddIdentity<ApplicationUser, IdentityRole>()` or `app.UseCookieAuthentication()`.
 
-   Return to the location where your app calls `app.UseCookieAuthentication()`;
+       Add `using Microsoft.AspNetCore.DataProtection;` to the using declarations at the top of the file.
 
-   Add `using Microsoft.Owin.Security.Interop;` to the using declarations at the top of the file.
+       Now add the following code before the call to `services.AddIdentity<ApplicationUser, IdentityRole>()` or `app.UseCookieAuthentication()`.
 
-   Now add the following code before the call to `app.UseCookieAuthentication()`.
+       ```
+       var protectionProvider = DataProtectionProvider.Create(
+           new DirectoryInfo(@"c:\keyring"));
+       var dataProtector = protectionProvider.CreateProtector(
+           "CookieAuthenticationMiddleware",
+           "Cookie",
+           "v2");
+       var ticketFormat = new TicketDataFormat(dataProtector);
+       ```     
+   
+       Finally update your `CookieAuthenticationOptions` to add a `TicketDataFormat` parameter, using the `ticketFormat` variable created in the code above.
 
-   ```
-   var protectionProvider = DataProtectionProvider.Create(
-       new DirectoryInfo(@"c:\keyring"));
-   var dataProtector = protectionProvider.CreateProtector(
-      "CookieAuthenticationMiddleware",
-      "Cookie",
-      "v2");
-    var ticketFormat = new AspNetTicketDataFormat(new DataProtectorShim(dataProtector));
-   ```
-   This is the *exact same code* you added to the ASP.NET Core application.
+       1. **ASP.NET Core with ASP.NET Identity**
+          ```
+          services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+          {
+              options.Cookies = new Microsoft.AspNetCore.Identity.IdentityCookieOptions
+              {
+                  options.Cookies.AuthenticationScheme = "Cookie",
+                  options.Cookies.ApplicationCookie.CookieName =
+                      ".AspNet.SharedCookie",
+                  options.Cookies.ApplicationCookie.TicketDataFormat = ticketFormat;
+              };
+           })
+           .AddEntityFrameworkStores<ApplicationDbContext>()
+           .AddDefaultTokenProviders();
+           ```
 
-   Finally update your `CookieAuthenticationOptions` to add a `TicketDataFormat` parameter, using the `ticketFormat` variable created in the code above.
-
-   ```
-   app.UseCookieAuthentication(new CookieAuthenticationOptions
-   {
-       AuthenticationType = "Cookie",
-       AuthenticationMode = Microsoft.Owin.Security.AuthenticationMode.Active,
-       LoginPath = new PathString("/Account/Login"),
-       CookieName = ".AspNet.SharedCookie",
-       TicketDataFormat = ticketFormat
-   });
-   ```
+        2. **ASP.NET Core using Cookie Middleware directly**
+           ```
+           app.UseCookieAuthentication(new CookieAuthenticationOptions
+           {
+               AuthenticationScheme = "Cookie",
+               CookieName = ".AspNet.SharedCookie",
+               TicketDataFormat = ticketFormat
+           });
+           ```
 
 ### Adding compatibility for applications using ASP.NET Identity
 

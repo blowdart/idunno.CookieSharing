@@ -24,7 +24,7 @@ namespace idunno.CookieSharing.FullFramework.Controllers
                 var identity = new ClaimsIdentity(
                     new List<Claim>
                     {
-                        new Claim(ClaimTypes.Email, model.Email, ClaimValueTypes.Email, Issuer)
+                        new Claim(ClaimTypes.Email, model.Email, ClaimValueTypes.String, Issuer)
                     },
                     "Cookie",
                     ClaimTypes.Email,

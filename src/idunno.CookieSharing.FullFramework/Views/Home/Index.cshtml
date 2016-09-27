@@ -49,16 +49,16 @@
             width: 100%;
         }
 
-        table.cookie {
-            table-layout:fixed;
-        }
+            table.cookie {
+                table-layout: fixed;
+            }
 
-        table th, table td {
-            font-size: 26px;
-            text-align: left;
-            word-wrap: break-word;
-            vertical-align: top;
-        }
+            table th, table td {
+                font-size: 26px;
+                text-align: left;
+                word-wrap: break-word;
+                vertical-align: top;
+            }
     </style>
 </head>
 <body>
@@ -104,32 +104,33 @@
                     </tr>
                 </thead>
                 <tbody>
-                @{
-                    var claimsUser = User.Identity as ClaimsIdentity;
-                    if (claimsUser != null)
-                    {
-                        foreach (var c in claimsUser.Claims)
+                    @{
+                        var claimsUser = User.Identity as ClaimsIdentity;
+                        if (claimsUser != null)
                         {
-                        <tr>
-                            <td>@c.Type</td>
-                            <td>@c.Value</td>
-                            <td>@c.Issuer</td>
-                        </tr>
+                            foreach (var c in claimsUser.Claims)
+                            {
+                                <tr>
+                                    <td>@c.Type</td>
+                                    <td>@c.Value</td>
+                                    <td>@c.Issuer</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="3">Cookie user is not a ClaimsIdentity.</td></tr>
                         }
                     }
-                    else
-                    {
-                        <tr><td colspan="3">Cookie user is not a ClaimsIdentity.</td></tr>
-                    }
-                }
                 </tbody>
             </table>
-            <form asp-controller="Home" asp-action="Logout" method="post">
+            using (Html.BeginForm("Logout", "Home", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken();
                 <p>
                     <button type="submit">Logout</button>
                 </p>
-            </form>
-
+            }
         }
         else
         {

@@ -26,11 +26,11 @@ namespace idunno.CookieSharing.Core.Controllers
                 var identity = new ClaimsIdentity(
                     new List<Claim>
                     {
-                        new Claim(ClaimTypes.Email, model.Email, ClaimValueTypes.Email, Issuer)
+                        new Claim(ClaimTypes.Name, model.Email, ClaimValueTypes.String, Issuer)
                     },
                     ClaimTypes.Email,
                     ClaimTypes.Role,
-                    "cookieSharingDemo");
+                    "Cookie");
                 var principal = new ClaimsPrincipal(identity);
 
                 await HttpContext.Authentication.SignInAsync("Cookie", principal,
