@@ -170,10 +170,12 @@ Sharing authorization cookies between ASP.NET 4.5 and .NET Core takes a number o
           {
               options.Cookies = new Microsoft.AspNetCore.Identity.IdentityCookieOptions
               {
-                  options.Cookies.AuthenticationScheme = "Cookie",
-                  options.Cookies.ApplicationCookie.CookieName =
-                      ".AspNet.SharedCookie",
-                  options.Cookies.ApplicationCookie.TicketDataFormat = ticketFormat;
+                  ApplicationCookie = new CookieAuthenticationOptions
+                  {
+                      AuthenticationScheme = "Cookie",
+                      CookieName = ".AspNet.SharedCookie",
+                      TicketDataFormat = ticketFormat
+                  }
               };
            })
            .AddEntityFrameworkStores<ApplicationDbContext>()
