@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Owin;
+﻿using System;
+using System.IO;
+
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Interop;
+
 using Owin;
-using System;
-using System.IO;
 
 namespace idunno.CookieSharing.FullFramework
 {
