@@ -1,12 +1,12 @@
-# Sharing Authorization Cookies between ASP.NET 4.5 and .NET Core
+# Sharing Authentication Cookies between ASP.NET 4.5 and .NET Core
 
 *This document is meant as a work in progress from which to update the official documentation. If anything is unclear, or doesn't work, please open an issue.*
 
-A commonly expressed scenario is a desire to share logins between an existing ASP.NET 4.5 application and an ASP.NET Core application. This can be achieved by creating a login cookie which can be read by both applications.
+A commonly expressed scenario is a desire to share logins between an existing ASP.NET 4.5 application and an ASP.NET Core application. This can be achieved by creating a cookie which can be read by both applications.
 
 ## Instructions
 
-Sharing authorization cookies between ASP.NET 4.5 and .NET Core takes a number of steps. The steps need vary based on whether you are using ASP.NET Identity or the ASP.Net Cookie middleware without Identity. Please follow the correct instructions for your configuration.
+Sharing authentication cookies between ASP.NET 4.5 and .NET Core takes a number of steps. The steps need vary based on whether you are using ASP.NET Identity or the ASP.Net Cookie middleware without Identity. Please follow the correct instructions for your configuration.
 
 
 1. **Install the interop packages into your applications.**
