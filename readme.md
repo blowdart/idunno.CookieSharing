@@ -59,7 +59,6 @@ Sharing authentication cookies between ASP.NET 4.5 and .NET Core takes a number 
                   AutomaticAuthenticate = true,
                   AutomaticChallenge = true,
                   CookieName = ".AspNet.SharedCookie"
-
               };
           })
           .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -126,11 +125,11 @@ Sharing authentication cookies between ASP.NET 4.5 and .NET Core takes a number 
 
       ```C#
       var protectionProvider = DataProtectionProvider.Create(
-          new DirectoryInfo(@"c:\keyring"));
+              new DirectoryInfo(@"c:\keyring"));
       var dataProtector = protectionProvider.CreateProtector(
-         "CookieAuthenticationMiddleware",
-         "Cookie",
-         "v2");
+              "CookieAuthenticationMiddleware",
+              "Cookie",
+              "v2");
       var ticketFormat = new AspNetTicketDataFormat(new DataProtectorShim(dataProtector));
       ```
 
@@ -154,11 +153,11 @@ Sharing authentication cookies between ASP.NET 4.5 and .NET Core takes a number 
 
        ```C#
        var protectionProvider = DataProtectionProvider.Create(
-           new DirectoryInfo(@"c:\keyring"));
+               new DirectoryInfo(@"c:\keyring"));
        var dataProtector = protectionProvider.CreateProtector(
-           "CookieAuthenticationMiddleware",
-           "Cookie",
-           "v2");
+               "CookieAuthenticationMiddleware",
+               "Cookie",
+               "v2");
        var ticketFormat = new TicketDataFormat(dataProtector);
        ```
 
