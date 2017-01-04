@@ -45,7 +45,10 @@ namespace idunno.CookieSharing.FullFramework
             {
                 AuthenticationType = "Cookie",
                 CookieName = ".AspNet.SharedCookie",
-                TicketDataFormat = ticketFormat
+                TicketDataFormat = ticketFormat,
+
+                // Set CookieManager to interop ChunkingCookieManager so chuncking format is compatible.
+                CookieManager = new ChunkingCookieManager()
             });
         }
     }
