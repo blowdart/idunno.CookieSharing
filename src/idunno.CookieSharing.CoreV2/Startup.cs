@@ -71,7 +71,7 @@ namespace idunno.CookieSharing.CoreV2
                 {
                     options.Cookie.Name = ".AspNet.SharedCookie";
                     options.TicketDataFormat = ticketFormat;
-                    options.Cookie.Domain = ".localhost";
+                    //options.Cookie.Domain = ".localhost";
                 });
         }
 
