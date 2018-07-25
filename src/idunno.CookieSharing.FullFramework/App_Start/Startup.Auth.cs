@@ -45,7 +45,8 @@ namespace idunno.CookieSharing.FullFramework
             {
                 AuthenticationType = "Cookie",
                 CookieName = ".AspNet.SharedCookie",
-                TicketDataFormat = ticketFormat
+                TicketDataFormat = ticketFormat,
+                //CookieDomain = ".localhost"
             });
         }
     }
